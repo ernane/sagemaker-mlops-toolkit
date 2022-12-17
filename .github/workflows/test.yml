@@ -31,6 +31,9 @@ jobs:
       matrix:
         os: [ "ubuntu-latest" ]
         python-version: [ "3.8", "3.9", "3.10" ]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     steps:
       #----------------------------------------------
@@ -76,18 +79,21 @@ jobs:
       - name: Run tests
         run: |
           source .venv/bin/activate
-          poetry run pytest
+          poetry run pytest --cov=./ --cov-report=xml
           coverage report
       #----------------------------------------------
       #             upload coverage stats
       # (requires CODECOV_TOKEN in repository secrets)
       #----------------------------------------------
-      - uses: actions/checkout@master
-      - uses: codecov/codecov-action@v3
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: ./coverage.xml
-          flags: unittests # optional
-          name: codecov-sagemaker-mlops-toolkit # optional
-          fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage/reports/
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage1.xml,./coverage2.xml
+          flags: unittests
+          name: codecov-smtoolkit
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true

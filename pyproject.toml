@@ -13,7 +13,7 @@ sagemaker = "2.124.0"
 pre-commit = "^2.20.0"
 
 [tool.pytest.ini_options]
-addopts = "-vvv --cov=smtoolkit --cov-report=term-missing --cov-report=xml -p no:warnings"
+addopts = "-vvv --cov=./ --cov-report=term-missing --cov-report=xml -p no:warnings"
 testpaths = ["tests"]
 
 
