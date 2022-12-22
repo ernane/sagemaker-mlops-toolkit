@@ -79,7 +79,7 @@ jobs:
       - name: Run tests
         run: |
           source .venv/bin/activate
-          poetry run pytest --cov=./ --cov-report=xml
+          poetry run pytest --cov=smtoolkit/ --cov-report=xml
           coverage report
       #----------------------------------------------
       #             upload coverage stats
