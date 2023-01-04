@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from pathlib import Path
+
 import pytest
 from mock import MagicMock, Mock, patch
 from packaging import version
@@ -9,6 +11,7 @@ from sagemaker.dataset_definition.inputs import (
     RedshiftDatasetDefinition,
     S3Input,
 )
+from sagemaker.fw_utils import UploadedCode
 from sagemaker.network import NetworkConfig
 from sagemaker.processing import FeatureStoreOutput, ProcessingInput, ProcessingOutput
 
@@ -21,6 +24,14 @@ ROLE = "arn:aws:iam::012345678901:role/SageMakerRole"
 MOCKED_S3_URI = "s3://mocked_s3_uri_from_upload_data"
 ECR_HOSTNAME = "ecr.us-west-2.amazonaws.com"
 CUSTOM_IMAGE_URI = "012345678901.dkr.ecr.us-west-2.amazonaws.com/my-custom-image-uri"
+
+
+@pytest.fixture()
+def uploaded_code(
+    s3_prefix="s3://mocked_s3_uri_from_upload_data/my_job_name/source/sourcedir.tar.gz",
+    script_name="processing_code.py",
+):
+    return UploadedCode(s3_prefix=s3_prefix, script_name=script_name)
 
 
 @pytest.fixture()
@@ -168,7 +179,10 @@ def test_xgboost_processor_with_required_parameters(
         sagemaker_session=sagemaker_session,
     )
 
-    processor.run(code="/local/path/to/processing_code.py")
+    code = Path("/tmp/processing_code.py")
+    code.touch(exist_ok=True)
+
+    processor.run(code="/tmp/processing_code.py")
 
     expected_args = _get_expected_args_modular_code(processor._current_job_name)
 
