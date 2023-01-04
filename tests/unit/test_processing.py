@@ -168,7 +168,7 @@ def test_xgboost_processor_with_required_parameters(
         sagemaker_session=sagemaker_session,
     )
 
-    processor.run(code="/tmp/processing_code.py")
+    processor.run(code="/local/path/to/processing_code.py")
 
     expected_args = _get_expected_args_modular_code(processor._current_job_name)
 
