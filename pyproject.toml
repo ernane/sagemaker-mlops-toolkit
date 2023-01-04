@@ -9,7 +9,7 @@ packages = [{include = "smtoolkit"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8.1"
-sagemaker = "2.124.0"
+sagemaker = "2.127.0"
 pre-commit = "^2.20.0"
 
 [tool.isort]

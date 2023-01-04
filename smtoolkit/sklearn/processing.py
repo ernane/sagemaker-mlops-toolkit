@@ -41,7 +41,4 @@ class SKLearnProcessorBuilder:
                 network_config=network_config,
             )
             self._instance = skLearn_processor
-            print(
-                f"***************************************************************{skLearn_processor}"
-            )
         return self._instance

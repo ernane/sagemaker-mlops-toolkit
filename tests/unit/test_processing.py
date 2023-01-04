@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import pytest
 from mock import MagicMock, Mock, patch
+from packaging import version
 from sagemaker.dataset_definition.inputs import (
     AthenaDatasetDefinition,
     DatasetDefinition,
@@ -12,6 +13,7 @@ from sagemaker.network import NetworkConfig
 from sagemaker.processing import FeatureStoreOutput, ProcessingInput, ProcessingOutput
 
 from smtoolkit.sklearn.processing import SKLearnProcessorBuilder
+from smtoolkit.xgboost.processing import XGBoostProcessorBuilder
 
 BUCKET_NAME = "mybucket"
 REGION = "us-west-2"
@@ -24,6 +26,11 @@ CUSTOM_IMAGE_URI = "012345678901.dkr.ecr.us-west-2.amazonaws.com/my-custom-image
 @pytest.fixture()
 def skLearn_processor():
     return SKLearnProcessorBuilder()
+
+
+@pytest.fixture()
+def xgboost_processor():
+    return XGBoostProcessorBuilder()
 
 
 @pytest.fixture()
@@ -134,6 +141,47 @@ def test_sklearn_with_all_parameters(
         "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:{}-cpu-py3"
     ).format(sklearn_version)
     expected_args["app_specification"]["ImageUri"] = sklearn_image_uri
+
+    sagemaker_session.process.assert_called_with(**expected_args)
+
+
+@patch("sagemaker.utils._botocore_resolver")
+@patch("os.path.exists", return_value=True)
+@patch("os.path.isfile", return_value=True)
+def test_xgboost_processor_with_required_parameters(
+    exists_mock,
+    isfile_mock,
+    botocore_resolver,
+    sagemaker_session,
+    xgboost_framework_version,
+    xgboost_processor,
+):
+    botocore_resolver.return_value.construct_endpoint.return_value = {
+        "hostname": ECR_HOSTNAME
+    }
+
+    processor = xgboost_processor(
+        role=ROLE,
+        instance_type="ml.m4.xlarge",
+        framework_version=xgboost_framework_version,
+        instance_count=1,
+        sagemaker_session=sagemaker_session,
+    )
+
+    processor.run(code="/tmp/processing_code.py")
+
+    expected_args = _get_expected_args_modular_code(processor._current_job_name)
+
+    if version.parse(xgboost_framework_version) < version.parse("1.2-1"):
+        xgboost_image_uri = (
+            "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-xgboost:{}-cpu-py3"
+        ).format(xgboost_framework_version)
+    else:
+        xgboost_image_uri = (
+            "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-xgboost:{}"
+        ).format(xgboost_framework_version)
+
+    expected_args["app_specification"]["ImageUri"] = xgboost_image_uri
 
     sagemaker_session.process.assert_called_with(**expected_args)
 
@@ -399,3 +447,57 @@ def _get_data_outputs_all_parameters():
             ),
         ),
     ]
+
+
+def _get_expected_args_modular_code(job_name, code_s3_uri=f"s3://{BUCKET_NAME}"):
+    return {
+        "inputs": [
+            {
+                "InputName": "code",
+                "AppManaged": False,
+                "S3Input": {
+                    "S3Uri": f"{code_s3_uri}/{job_name}/source/sourcedir.tar.gz",
+                    "LocalPath": "/opt/ml/processing/input/code/",
+                    "S3DataType": "S3Prefix",
+                    "S3InputMode": "File",
+                    "S3DataDistributionType": "FullyReplicated",
+                    "S3CompressionType": "None",
+                },
+            },
+            {
+                "InputName": "entrypoint",
+                "AppManaged": False,
+                "S3Input": {
+                    "S3Uri": f"{code_s3_uri}/{job_name}/source/runproc.sh",
+                    "LocalPath": "/opt/ml/processing/input/entrypoint",
+                    "S3DataType": "S3Prefix",
+                    "S3InputMode": "File",
+                    "S3DataDistributionType": "FullyReplicated",
+                    "S3CompressionType": "None",
+                },
+            },
+        ],
+        "output_config": {"Outputs": []},
+        "experiment_config": None,
+        "job_name": job_name,
+        "resources": {
+            "ClusterConfig": {
+                "InstanceType": "ml.m4.xlarge",
+                "InstanceCount": 1,
+                "VolumeSizeInGB": 30,
+            }
+        },
+        "stopping_condition": None,
+        "app_specification": {
+            "ImageUri": CUSTOM_IMAGE_URI,
+            "ContainerEntrypoint": [
+                "/bin/bash",
+                "/opt/ml/processing/input/entrypoint/runproc.sh",
+            ],
+        },
+        "environment": None,
+        "network_config": None,
+        "role_arn": ROLE,
+        "tags": None,
+        "experiment_config": None,
+    }

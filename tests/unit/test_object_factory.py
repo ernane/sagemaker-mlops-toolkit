@@ -4,7 +4,7 @@ import pytest
 from mock import MagicMock, Mock
 from sagemaker.sklearn.processing import SKLearnProcessor
 
-from smtoolkit.object_factory import aws_processing
+from smtoolkit.object_factory import sm_processing
 from smtoolkit.sklearn.processing import SKLearnProcessorBuilder
 
 BUCKET_NAME = "mybucket"
@@ -37,7 +37,7 @@ def sagemaker_session():
     return session_mock
 
 
-def test_aws_processing_sklearn(sklearn_version, sagemaker_session):
+def test_sm_processing_sklearn(sklearn_version, sagemaker_session):
     params = {
         "role": ROLE,
         "instance_type": "ml.m4.xlarge",
@@ -45,18 +45,18 @@ def test_aws_processing_sklearn(sklearn_version, sagemaker_session):
         "instance_count": 1,
         "sagemaker_session": sagemaker_session,
     }
-    processor = aws_processing.get_or_create(processor="SKLearnProcessor", **params)
+    processor = sm_processing.get_or_create(processor="SKLearnProcessor", **params)
 
     assert isinstance(processor, SKLearnProcessor)
 
 
-def test_aws_processing_sklearn_exception():
+def test_sm_processing_sklearn_exception():
     with pytest.raises(Exception):
-        assert aws_processing.get_or_create(processor="ProcessorFaker")
+        assert sm_processing.get_or_create(processor="ProcessorFaker")
 
 
-def test_aws_processing_processors():
-    processors = aws_processing.builders
+def test_sm_processing_processors():
+    processors = sm_processing.builders
     skLearn_processor = processors["SKLearnProcessor"]
 
     assert isinstance(processors, dict)

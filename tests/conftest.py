@@ -129,6 +129,13 @@ def region(boto_session):
     return boto_session.region_name
 
 
+@pytest.fixture(scope="module")
+def xgboost_framework_version(xgboost_version):
+    if xgboost_version in ("1", "latest"):
+        pytest.skip("Skipping XGBoost algorithm version.")
+    return xgboost_version
+
+
 def pytest_generate_tests(metafunc):
     if "instance_type" in metafunc.fixturenames:
         boto_config = metafunc.config.getoption("--boto-config")

@@ -678,7 +678,6 @@ category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "protobuf-3.20.3-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:e67f9af1b607eb3a89aafc9bc68a9d1172aae788b2445cb9fd781bd97531f1f1"},
     {file = "protobuf-3.20.3-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:f4bd856d702e5b0d96a00ec6b307b0f51c1982c2bf9c0052cf9019e9a544ba99"},
     {file = "protobuf-3.20.3-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:9aae4406ea63d825636cc11ffb34ad3379335803216ee3a856787bcf5ccc751e"},
     {file = "protobuf-3.20.3-cp310-cp310-win32.whl", hash = "sha256:28545383d61f55b57cf4df63eebd9827754fd2dc25f80c5253f9184235db242c"},
@@ -882,13 +881,13 @@ crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
 
 [[package]]
 name = "sagemaker"
-version = "2.124.0"
+version = "2.127.0"
 description = "Open source library for training and deploying models on Amazon SageMaker."
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 files = [
-    {file = "sagemaker-2.124.0.tar.gz", hash = "sha256:3ff9c148408f7c4f0f3cba4c7bef8556dd2fd8ddd72d9f461f0b39e86e7caebe"},
+    {file = "sagemaker-2.127.0.tar.gz", hash = "sha256:417d229513be4dafc5dc3375f94c9bf0fa4e28f03c84780ea4afcb8861b5c08d"},
 ]
 
 [package.dependencies]
@@ -1060,4 +1059,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1"
-content-hash = "46a87fe4156001ced6b104de5532eac7034103035cd21b252df5b1b648156f17"
+content-hash = "33ec70329f875aa20220db9dbf4324a1a7749a3b0620aa79005c9133b485b20a"

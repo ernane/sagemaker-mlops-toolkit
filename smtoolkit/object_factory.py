@@ -1,4 +1,5 @@
 from smtoolkit.sklearn.processing import SKLearnProcessorBuilder
+from smtoolkit.xgboost.processing import XGBoostProcessorBuilder
 
 
 class ObjectFactory:
@@ -19,10 +20,11 @@ class ObjectFactory:
         return builder(**kwargs)
 
 
-class AWSProcessing(ObjectFactory):
+class SMProcessing(ObjectFactory):
     def get_or_create(self, processor, **kwargs):
         return self.create(processor, **kwargs)
 
 
-aws_processing = AWSProcessing()
-aws_processing.register_builder("SKLearnProcessor", SKLearnProcessorBuilder())
+sm_processing = SMProcessing()
+sm_processing.register_builder("SKLearnProcessor", SKLearnProcessorBuilder())
+sm_processing.register_builder("XGBoostProcessor", XGBoostProcessorBuilder())
